@@ -2,17 +2,32 @@ openapi: 3.0.3
 info:
   title: Custom Clash of Clans API
   version: 1.0.0
+  description: |
+    A developer-friendly wrapper around the official Clash of Clans API.
+
+    This service focuses on player hero equipment data, including availability and
+    cumulative resource (ore) costs per rarity (COMMON, EPIC). Data for ore costs
+    is provided via a local catalog and not from the official API.
 servers:
   - url: http://localhost:8080
+    description: Local development
+tags:
+  - name: players
+    description: Player-centric endpoints
 paths:
   /v1/players/{tag}/hero-equipments:
     get:
+      tags: [players]
       summary: List player's hero equipments with availability
+      description: |
+        Returns player's hero equipments detected from the official API response.
+        Marks equipments not present on the player as unavailable based on the local
+        equipment catalog.
       parameters:
         - name: tag
           in: path
           required: true
-          description: Player tag (URL-encoded, e.g. %23ABC123)
+          description: Player tag (URL-encoded, e.g. %23ABC123). The API also accepts raw `#ABC123` or `ABC123`.
           schema:
             type: string
       responses:
@@ -33,18 +48,38 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Equipment'
+              examples:
+                sample:
+                  summary: Example response
+                  value:
+                    playerTag: "%2382VCYUURR"
+                    available:
+                      - name: "Rage Vial"
+                        level: 6
+                        maxLevel: 18
+                        available: true
+                    unavailable:
+                      - name: "Giant Gauntlet"
+                        level: 0
+                        maxLevel: 0
+                        available: false
         '400':
           description: Bad Request
         '502':
           description: Bad Gateway
   /v1/players/{tag}/hero-equipments/costs:
     get:
+      tags: [players]
       summary: Get cumulative ore spent per equipment and totals
+      description: |
+        Computes cumulative ore spent (shiny, glowy, starry) up to the player's current
+        level for each equipment. Rarity-specific per-level costs are read from the local
+        catalog (`data/hero_equipment.json`).
       parameters:
         - name: tag
           in: path
           required: true
-          description: Player tag (URL-encoded, e.g. %23ABC123)
+          description: Player tag (URL-encoded, e.g. %23ABC123). The API also accepts raw `#ABC123` or `ABC123`.
           schema:
             type: string
       responses:
@@ -63,6 +98,24 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/EquipmentSpend'
+              examples:
+                sample:
+                  summary: Example response
+                  value:
+                    playerTag: "%2382VCYUURR"
+                    total:
+                      shiny: 67640
+                      glowy: 4200
+                      starry: 110
+                    equipments:
+                      - name: "Rage Vial"
+                        rarity: "COMMON"
+                        level: 6
+                        spent: { shiny: 3320, glowy: 120, starry: 0 }
+                      - name: "Giant Arrow"
+                        rarity: "COMMON"
+                        level: 18
+                        spent: { shiny: 27260, glowy: 1920, starry: 0 }
         '400':
           description: Bad Request
         '502':
@@ -76,8 +129,10 @@ components:
           type: string
         level:
           type: integer
+          description: Current player equipment level (0 when unavailable)
         maxLevel:
           type: integer
+          description: Reported max level from the official API when available, else 0
         available:
           type: boolean
     OreTotals:
@@ -99,5 +154,6 @@ components:
           enum: [COMMON, EPIC, UNKNOWN]
         level:
           type: integer
+          description: Current player equipment level
         spent:
           $ref: '#/components/schemas/OreTotals'
