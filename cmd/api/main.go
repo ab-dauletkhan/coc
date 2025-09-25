@@ -1,8 +1,12 @@
 package main
 
 import (
+	"io"
 	"log"
+	"net/http"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -17,6 +21,13 @@ func main() {
 	_ = godotenv.Load()
 
 	cfg := config.Load()
+
+	// Try to detect public outbound IP for allowlisting
+	if ip := fetchPublicIP(); ip != "" {
+		log.Printf("public outbound IP (for allowlist): %s", ip)
+	} else {
+		log.Println("public outbound IP not detected (network may block metadata services)")
+	}
 
 	r := gin.Default()
 	_ = r.SetTrustedProxies(nil)
@@ -53,4 +64,29 @@ func getenv(key, def string) string {
 		return v
 	}
 	return def
+}
+
+func fetchPublicIP() string {
+	endpoints := []string{
+		"https://api.ipify.org",
+		"https://ifconfig.me",
+		"https://icanhazip.com",
+	}
+	client := &http.Client{Timeout: 2 * time.Second}
+	for _, url := range endpoints {
+		resp, err := client.Get(url)
+		if err != nil {
+			continue
+		}
+		b, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil || resp.StatusCode >= 400 {
+			continue
+		}
+		ip := strings.TrimSpace(string(b))
+		if ip != "" {
+			return ip
+		}
+	}
+	return ""
 }
