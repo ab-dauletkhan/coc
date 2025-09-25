@@ -11,7 +11,11 @@ import (
 var openapiYAML []byte
 
 func RegisterSwagger(r *gin.Engine) {
+	// Serve spec at both root and under /docs to work behind path-based proxies
 	r.GET("/openapi.yaml", func(c *gin.Context) {
+		c.Data(http.StatusOK, "application/yaml", openapiYAML)
+	})
+	r.GET("/docs/openapi.yaml", func(c *gin.Context) {
 		c.Data(http.StatusOK, "application/yaml", openapiYAML)
 	})
 	r.GET("/docs", func(c *gin.Context) {
@@ -27,11 +31,15 @@ func RegisterSwagger(r *gin.Engine) {
     <div id="swagger-ui"></div>
     <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js"></script>
     <script>
-      window.ui = SwaggerUIBundle({
-        url: window.location.origin + '/openapi.yaml',
-        dom_id: '#swagger-ui',
-        deepLinking: true,
-      });
+      (function(){
+        var base = window.location.pathname.replace(/\/docs.*/, '/docs');
+        var specUrl = base + '/openapi.yaml';
+        window.ui = SwaggerUIBundle({
+          url: specUrl,
+          dom_id: '#swagger-ui',
+          deepLinking: true,
+        });
+      })();
     </script>
   </body>
 </html>`
