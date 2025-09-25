@@ -37,6 +37,8 @@ func main() {
 	equipHandler.Register(r)
 	costsHandler := apphttp.NewHeroEquipmentsCostsHandler(cocClient, cat)
 	costsHandler.Register(r)
+	clanCostsHandler := apphttp.NewClanEquipmentsCostsHandler(cocClient, cat)
+	clanCostsHandler.Register(r)
 
 	// Swagger UI & spec
 	apphttp.RegisterSwagger(r)

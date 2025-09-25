@@ -14,6 +14,8 @@ servers:
 tags:
   - name: players
     description: Player-centric endpoints
+  - name: clans
+    description: Clan-centric endpoints
 paths:
   /v1/players/{tag}/hero-equipments:
     get:
@@ -120,6 +122,54 @@ paths:
           description: Bad Request
         '502':
           description: Bad Gateway
+  /v1/clans/{tag}/hero-equipments/costs:
+    get:
+      tags: [clans]
+      summary: Get clan-wide cumulative ore spent per member and totals
+      description: |
+        Aggregates shiny, glowy, and starry ore spent for each clan member by fetching
+        each player's equipments in parallel and summing costs using the local catalog.
+        Members are returned sorted by shiny desc, then glowy desc, then starry desc.
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          description: Clan tag (URL-encoded, e.g. %23ABC123). The API also accepts raw `#ABC123` or `ABC123`.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clanTag:
+                    type: string
+                  total:
+                    $ref: '#/components/schemas/OreTotals'
+                  members:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ClanMemberSpend'
+              examples:
+                sample:
+                  summary: Example response
+                  value:
+                    clanTag: "%23CLAN123"
+                    total: { shiny: 123456, glowy: 7890, starry: 210 }
+                    members:
+                      - tag: "%23PLAYER1"
+                        name: "Alice"
+                        spent: { shiny: 40000, glowy: 1200, starry: 60 }
+                      - tag: "%23PLAYER2"
+                        name: "Bob"
+                        spent: { shiny: 30000, glowy: 1000, starry: 40 }
+        '400':
+          description: Bad Request
+        '502':
+          description: Bad Gateway
 components:
   schemas:
     Equipment:
@@ -155,5 +205,14 @@ components:
         level:
           type: integer
           description: Current player equipment level
+        spent:
+          $ref: '#/components/schemas/OreTotals'
+    ClanMemberSpend:
+      type: object
+      properties:
+        tag:
+          type: string
+        name:
+          type: string
         spent:
           $ref: '#/components/schemas/OreTotals'
