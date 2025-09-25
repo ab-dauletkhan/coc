@@ -14,7 +14,10 @@ import (
 	"github.com/dauletkhan/coc/internal/catalog"
 	"github.com/dauletkhan/coc/internal/coc"
 	"github.com/dauletkhan/coc/internal/config"
-	apphttp "github.com/dauletkhan/coc/internal/http"
+
+	primaryhttp "github.com/dauletkhan/coc/internal/adapters/primary/http"
+	secondary "github.com/dauletkhan/coc/internal/adapters/secondary"
+	"github.com/dauletkhan/coc/internal/application/usecases"
 )
 
 func main() {
@@ -44,15 +47,23 @@ func main() {
 	}
 
 	// Handlers
-	equipHandler := apphttp.NewHeroEquipmentsHandler(cocClient, cat)
-	equipHandler.Register(r)
-	costsHandler := apphttp.NewHeroEquipmentsCostsHandler(cocClient, cat)
-	costsHandler.Register(r)
-	clanCostsHandler := apphttp.NewClanEquipmentsCostsHandler(cocClient, cat)
+	// Hexagonal handlers
+	catalogAdapter := secondary.NewCatalogAdapter(cat)
+	cocAdapter := secondary.NewCocAPIAdapter(cocClient)
+	playerCostsUC := usecases.NewPlayerEquipmentCostsUseCase(cocAdapter, catalogAdapter)
+	playerCostsHandler := primaryhttp.NewPlayerEquipmentCostsHandler(playerCostsUC)
+	playerCostsHandler.Register(r)
+
+	playerEquipUC := usecases.NewPlayerHeroEquipmentsUseCase(cocAdapter, catalogAdapter)
+	playerEquipHandler := primaryhttp.NewPlayerHeroEquipmentsHandler(playerEquipUC)
+	playerEquipHandler.Register(r)
+
+	clanCostsUC := usecases.NewClanEquipmentCostsUseCase(cocAdapter, cocAdapter, catalogAdapter)
+	clanCostsHandler := primaryhttp.NewClanEquipmentCostsHandler(clanCostsUC)
 	clanCostsHandler.Register(r)
 
 	// Swagger UI & spec
-	apphttp.RegisterSwagger(r)
+	primaryhttp.RegisterSwagger(r)
 
 	if err := r.Run(cfg.ServerAddr); err != nil {
 		log.Fatalf("server failed: %v", err)
