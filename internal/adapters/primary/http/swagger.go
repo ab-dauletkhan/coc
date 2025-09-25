@@ -12,7 +12,7 @@ var openapiYAML []byte
 
 func RegisterSwagger(r *gin.Engine) {
 	r.GET("/openapi.yaml", func(c *gin.Context) {
-		c.Data(http.StatusOK, "application/yaml; charset=utf-8", openapiYAML)
+		c.Data(http.StatusOK, "application/yaml", openapiYAML)
 	})
 	r.GET("/docs", func(c *gin.Context) {
 		html := `<!doctype html>
@@ -28,8 +28,9 @@ func RegisterSwagger(r *gin.Engine) {
     <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js"></script>
     <script>
       window.ui = SwaggerUIBundle({
-        url: '/openapi.yaml',
+        url: window.location.origin + '/openapi.yaml',
         dom_id: '#swagger-ui',
+        deepLinking: true,
       });
     </script>
   </body>
