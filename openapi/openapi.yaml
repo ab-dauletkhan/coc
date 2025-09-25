@@ -1,0 +1,103 @@
+openapi: 3.0.3
+info:
+  title: Custom Clash of Clans API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /v1/players/{tag}/hero-equipments:
+    get:
+      summary: List player's hero equipments with availability
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          description: Player tag (URL-encoded, e.g. %23ABC123)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  playerTag:
+                    type: string
+                  available:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Equipment'
+                  unavailable:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Equipment'
+        '400':
+          description: Bad Request
+        '502':
+          description: Bad Gateway
+  /v1/players/{tag}/hero-equipments/costs:
+    get:
+      summary: Get cumulative ore spent per equipment and totals
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          description: Player tag (URL-encoded, e.g. %23ABC123)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  playerTag:
+                    type: string
+                  total:
+                    $ref: '#/components/schemas/OreTotals'
+                  equipments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EquipmentSpend'
+        '400':
+          description: Bad Request
+        '502':
+          description: Bad Gateway
+components:
+  schemas:
+    Equipment:
+      type: object
+      properties:
+        name:
+          type: string
+        level:
+          type: integer
+        maxLevel:
+          type: integer
+        available:
+          type: boolean
+    OreTotals:
+      type: object
+      properties:
+        shiny:
+          type: integer
+        glowy:
+          type: integer
+        starry:
+          type: integer
+    EquipmentSpend:
+      type: object
+      properties:
+        name:
+          type: string
+        rarity:
+          type: string
+          enum: [COMMON, EPIC, UNKNOWN]
+        level:
+          type: integer
+        spent:
+          $ref: '#/components/schemas/OreTotals'
