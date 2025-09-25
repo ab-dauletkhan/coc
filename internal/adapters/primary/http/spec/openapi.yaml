@@ -9,7 +9,7 @@ info:
     cumulative resource (ore) costs per rarity (COMMON, EPIC). Data for ore costs
     is provided via a local catalog and not from the official API.
 servers:
-  - url: http://localhost:8080
+  - url: https://coc-7tqg.onrender.com
     description: Local development
 tags:
   - name: players
