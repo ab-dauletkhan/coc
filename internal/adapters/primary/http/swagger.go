@@ -12,13 +12,19 @@ var openapiYAML []byte
 
 func RegisterSwagger(r *gin.Engine) {
 	// Serve spec at both root and under /docs to work behind path-based proxies
+	r.OPTIONS("/openapi.yaml", corsPreflight)
+	r.OPTIONS("/docs/openapi.yaml", corsPreflight)
 	r.GET("/openapi.yaml", func(c *gin.Context) {
+		setCORS(c)
 		c.Data(http.StatusOK, "application/yaml", openapiYAML)
 	})
 	r.GET("/docs/openapi.yaml", func(c *gin.Context) {
+		setCORS(c)
 		c.Data(http.StatusOK, "application/yaml", openapiYAML)
 	})
+	r.OPTIONS("/docs", corsPreflight)
 	r.GET("/docs", func(c *gin.Context) {
+		setCORS(c)
 		html := `<!doctype html>
 <html>
   <head>
@@ -45,4 +51,16 @@ func RegisterSwagger(r *gin.Engine) {
 </html>`
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))
 	})
+}
+
+func setCORS(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Vary", "Origin")
+	c.Header("Access-Control-Allow-Methods", "GET, OPTIONS")
+	c.Header("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept, Origin, X-Requested-With")
+}
+
+func corsPreflight(c *gin.Context) {
+	setCORS(c)
+	c.Status(http.StatusNoContent)
 }
