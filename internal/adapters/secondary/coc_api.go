@@ -3,7 +3,7 @@ package secondary
 import (
 	"context"
 
-	"github.com/dauletkhan/coc/internal/coc"
+	"github.com/ab-dauletkhan/coc/internal/coc"
 )
 
 // CocAPIAdapter adapts internal/coc.Client to domain ports.

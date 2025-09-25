@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/dauletkhan/coc/internal/application/usecases"
+	"github.com/ab-dauletkhan/coc/internal/application/usecases"
 )
 
 type PlayerEquipmentCostsHandler struct {

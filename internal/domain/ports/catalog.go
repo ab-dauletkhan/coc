@@ -4,6 +4,8 @@ package ports
 type CatalogRepository interface {
 	// GetRarity returns the rarity for the given equipment name or empty when unknown.
 	GetRarity(name string) string
+	// GetID returns sortable ID for the given equipment name or 0 if unknown.
+	GetID(name string) int
 	// CostsCommon returns the per-level common costs.
 	CostsCommon() []OreCost
 	// CostsEpic returns the per-level epic costs.

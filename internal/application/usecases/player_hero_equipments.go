@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"sort"
 
-	"github.com/dauletkhan/coc/internal/domain/ports"
+	"github.com/ab-dauletkhan/coc/internal/domain/ports"
 )
 
 type PlayerHeroEquipmentsUseCase struct {
@@ -29,6 +29,7 @@ type Equipment struct {
 	Level     int    `json:"level"`
 	MaxLevel  int    `json:"maxLevel"`
 	Available bool   `json:"available"`
+	ID        int    `json:"id"`
 }
 
 func (uc *PlayerHeroEquipmentsUseCase) Execute(ctx context.Context, playerTag string) (PlayerHeroEquipmentsResult, int, error) {
@@ -65,6 +66,7 @@ func (uc *PlayerHeroEquipmentsUseCase) Execute(ctx context.Context, playerTag st
 			Level:     it.Level,
 			MaxLevel:  it.MaxLevel,
 			Available: true,
+			ID:        uc.catalog.GetID(name),
 		})
 	}
 	unavailable := make([]Equipment, 0)
@@ -76,11 +78,22 @@ func (uc *PlayerHeroEquipmentsUseCase) Execute(ctx context.Context, playerTag st
 				Level:     0,
 				MaxLevel:  0,
 				Available: false,
+				ID:        uc.catalog.GetID(name),
 			})
 		}
 	}
-	sort.Slice(available, func(i, j int) bool { return available[i].Name < available[j].Name })
-	sort.Slice(unavailable, func(i, j int) bool { return unavailable[i].Name < unavailable[j].Name })
+	sort.Slice(available, func(i, j int) bool {
+		if available[i].ID != available[j].ID {
+			return available[i].ID < available[j].ID
+		}
+		return available[i].Name < available[j].Name
+	})
+	sort.Slice(unavailable, func(i, j int) bool {
+		if unavailable[i].ID != unavailable[j].ID {
+			return unavailable[i].ID < unavailable[j].ID
+		}
+		return unavailable[i].Name < unavailable[j].Name
+	})
 	out.PlayerTag = playerTag
 	out.Available = available
 	out.Unavailable = unavailable

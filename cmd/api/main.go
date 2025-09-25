@@ -11,13 +11,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"github.com/dauletkhan/coc/internal/catalog"
-	"github.com/dauletkhan/coc/internal/coc"
-	"github.com/dauletkhan/coc/internal/config"
+	"github.com/ab-dauletkhan/coc/internal/catalog"
+	"github.com/ab-dauletkhan/coc/internal/coc"
+	"github.com/ab-dauletkhan/coc/internal/config"
 
-	primaryhttp "github.com/dauletkhan/coc/internal/adapters/primary/http"
-	secondary "github.com/dauletkhan/coc/internal/adapters/secondary"
-	"github.com/dauletkhan/coc/internal/application/usecases"
+	primaryhttp "github.com/ab-dauletkhan/coc/internal/adapters/primary/http"
+	secondary "github.com/ab-dauletkhan/coc/internal/adapters/secondary"
+	"github.com/ab-dauletkhan/coc/internal/application/usecases"
 )
 
 func main() {

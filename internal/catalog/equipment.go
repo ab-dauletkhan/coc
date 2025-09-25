@@ -12,9 +12,22 @@ type EquipmentCatalog struct {
 	EpicCostsPerLevel   []OreCost   `json:"epicCostsPerLevel"`
 }
 
+// Hero is an enum describing which hero an equipment belongs to.
+type Hero string
+
+const (
+	HeroBarbarianKing Hero = "BARBARIAN_KING"
+	HeroArcherQueen   Hero = "ARCHER_QUEEN"
+	HeroGrandWarden   Hero = "GRAND_WARDEN"
+	HeroRoyalChampion Hero = "ROYAL_CHAMPION"
+	HeroMinionPrince  Hero = "MINION_PRINCE"
+)
+
 type Equipment struct {
 	Name   string `json:"name"`
 	Rarity string `json:"rarity"` // COMMON or EPIC
+	Hero   Hero   `json:"hero"`   // e.g. BARBARIAN_KING, ARCHER_QUEEN, GRAND_WARDEN, ROYAL_CHAMPION, MINION_PRINCE
+	ID     int    `json:"id"`     // sortable stable identifier
 }
 
 type OreCost struct {

@@ -3,8 +3,8 @@ package secondary
 import (
 	"strings"
 
-	"github.com/dauletkhan/coc/internal/catalog"
-	"github.com/dauletkhan/coc/internal/domain/ports"
+	"github.com/ab-dauletkhan/coc/internal/catalog"
+	"github.com/ab-dauletkhan/coc/internal/domain/ports"
 )
 
 // CatalogAdapter adapts internal/catalog to the domain CatalogRepository port.
@@ -24,6 +24,16 @@ func (a *CatalogAdapter) GetRarity(name string) string {
 		}
 	}
 	return ""
+}
+
+func (a *CatalogAdapter) GetID(name string) int {
+	upper := strings.ToUpper(strings.TrimSpace(name))
+	for _, it := range a.cat.Items {
+		if strings.ToUpper(it.Name) == upper {
+			return it.ID
+		}
+	}
+	return 0
 }
 
 func (a *CatalogAdapter) CostsCommon() []ports.OreCost {

@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/dauletkhan/coc/internal/domain/models"
-	"github.com/dauletkhan/coc/internal/domain/ports"
+	"github.com/ab-dauletkhan/coc/internal/domain/models"
+	"github.com/ab-dauletkhan/coc/internal/domain/ports"
 )
 
 type ClanEquipmentCostsUseCase struct {

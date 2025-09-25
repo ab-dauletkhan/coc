@@ -6,8 +6,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/dauletkhan/coc/internal/domain/models"
-	"github.com/dauletkhan/coc/internal/domain/ports"
+	"github.com/ab-dauletkhan/coc/internal/domain/models"
+	"github.com/ab-dauletkhan/coc/internal/domain/ports"
 )
 
 // PlayerEquipmentCostsUseCase computes per-equipment and total ore spent for a player.
@@ -25,6 +25,7 @@ type EquipmentSpend struct {
 	Rarity string           `json:"rarity"`
 	Level  int              `json:"level"`
 	Spent  models.OreTotals `json:"spent"`
+	ID     int              `json:"id"`
 }
 
 type PlayerEquipmentCostsResult struct {
@@ -98,9 +99,15 @@ func (uc *PlayerEquipmentCostsUseCase) Execute(ctx context.Context, playerTag st
 			Rarity: strings.ToUpper(rarity),
 			Level:  it.Level,
 			Spent:  spent,
+			ID:     uc.catalog.GetID(name),
 		})
 	}
-	sort.Slice(results, func(i, j int) bool { return results[i].Name < results[j].Name })
+	sort.Slice(results, func(i, j int) bool {
+		if results[i].ID != results[j].ID {
+			return results[i].ID < results[j].ID
+		}
+		return results[i].Name < results[j].Name
+	})
 	out.PlayerTag = playerTag
 	out.Total = total
 	out.Equipments = results

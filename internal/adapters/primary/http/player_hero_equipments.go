@@ -1,51 +1,49 @@
 package http
 
 import (
-    "context"
-    "net/http"
-    "time"
+	"context"
+	"net/http"
+	"time"
 
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 
-    "github.com/dauletkhan/coc/internal/application/usecases"
+	"github.com/ab-dauletkhan/coc/internal/application/usecases"
 )
 
 type PlayerHeroEquipmentsHandler struct {
-    uc *usecases.PlayerHeroEquipmentsUseCase
+	uc *usecases.PlayerHeroEquipmentsUseCase
 }
 
 func NewPlayerHeroEquipmentsHandler(uc *usecases.PlayerHeroEquipmentsUseCase) *PlayerHeroEquipmentsHandler {
-    return &PlayerHeroEquipmentsHandler{uc: uc}
+	return &PlayerHeroEquipmentsHandler{uc: uc}
 }
 
 func (h *PlayerHeroEquipmentsHandler) Register(r *gin.Engine) {
-    r.GET("/v1/players/:tag/hero-equipments", h.get)
+	r.GET("/v1/players/:tag/hero-equipments", h.get)
 }
 
 func (h *PlayerHeroEquipmentsHandler) get(c *gin.Context) {
-    tag := c.Param("tag")
-    if tag == "" {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "missing tag"})
-        return
-    }
-    nTag := normalizePlayerTag(tag)
+	tag := c.Param("tag")
+	if tag == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing tag"})
+		return
+	}
+	nTag := normalizePlayerTag(tag)
 
-    ctx, cancel := context.WithTimeout(c.Request.Context(), 6*time.Second)
-    defer cancel()
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 6*time.Second)
+	defer cancel()
 
-    res, status, err := h.uc.Execute(ctx, nTag)
-    if err != nil {
-        if status == 0 {
-            status = http.StatusBadGateway
-        }
-        c.JSON(status, gin.H{"error": err.Error()})
-        return
-    }
-    if status >= 400 {
-        c.Status(status)
-        return
-    }
-    c.JSON(http.StatusOK, res)
+	res, status, err := h.uc.Execute(ctx, nTag)
+	if err != nil {
+		if status == 0 {
+			status = http.StatusBadGateway
+		}
+		c.JSON(status, gin.H{"error": err.Error()})
+		return
+	}
+	if status >= 400 {
+		c.Status(status)
+		return
+	}
+	c.JSON(http.StatusOK, res)
 }
-
-
