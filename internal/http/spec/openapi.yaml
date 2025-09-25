@@ -1,0 +1,45 @@
+openapi: 3.0.3
+info:
+  title: Custom Clash of Clans API
+  version: 1.0.0
+  description: |
+    Embedded spec for production Swagger UI.
+servers:
+  - url: /
+paths:
+  /v1/players/{tag}/hero-equipments:
+    get:
+      summary: List player's hero equipments with availability
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /v1/players/{tag}/hero-equipments/costs:
+    get:
+      summary: Get cumulative ore spent per equipment and totals
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /v1/clans/{tag}/hero-equipments/costs:
+    get:
+      summary: Get clan-wide cumulative ore spent per member and totals
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK

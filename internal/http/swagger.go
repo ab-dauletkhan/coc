@@ -6,8 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//go:embed spec/openapi.yaml
+var openapiYAML []byte
+
 func RegisterSwagger(r *gin.Engine) {
-	r.StaticFile("/openapi.yaml", "openapi/openapi.yaml")
+	r.GET("/openapi.yaml", func(c *gin.Context) {
+		c.Data(http.StatusOK, "application/yaml; charset=utf-8", openapiYAML)
+	})
 	r.GET("/docs", func(c *gin.Context) {
 		html := `<!doctype html>
 <html>
